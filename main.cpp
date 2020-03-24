@@ -95,7 +95,7 @@ int getClosestVertex(long long lat, long long lon, unordered_map<int, Point>&poi
     return minIndex;
 }
 
-void longlongtochar(string myString, long long num, int &size) {
+void longlongtochar(string& myString, long long num, int &size) {
     long long numcpy = num;
     long long temp, temp2, temp3;
     bool neg = false;
@@ -125,12 +125,14 @@ void longlongtochar(string myString, long long num, int &size) {
       digit = temp2 - (temp3*10);
       //Serial.println((int)temp2);
       //Serial.println((int)digit);
-      myString[(size-1) - i + delim] = digit + '0';
+      cout << "Digit " << digit <<  " "  << (size-1) - i + delim << endl;
+      myString.push_back(digit + '0');
     }
     if(neg)
     {
       size++;
     }
+    cout << "myString " << myString << endl;
    
 }
 
@@ -186,7 +188,7 @@ int main(int argc, char *argv[]) {
                 {
                     int stepping = vertex2;
                     long long count = 0;
-                    string str;
+                    string str = "";
                     int size = 0;
                     while (stepping != vertex1)
                     {
@@ -195,9 +197,11 @@ int main(int argc, char *argv[]) {
                         // crawl up the search tree one step
                         stepping = searchtree[stepping].first;
                     }
-                    longlongtochar(str, count, size);
+                    longlongtochar(str, count + 1, size);
                     path.push_front(vertex1);
                     Serial.writeline("N ");
+                    cout << "Count " << count << " size " << size << endl;
+                    cout << "Str: " << str << endl;
                     Serial.writeline(str);
                     Serial.writeline("\n");
                 }

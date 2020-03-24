@@ -1,25 +1,58 @@
 #include "serial_handling.h"
 char buffer[30];
 extern shared_vars shared;
+bool wait_on_serial(uint8_t nbytes, long timeout);
+long long pow(int base, int exponent)
+{
+  long long copy = (long long)base;
+  for(int i = 1; i <exponent; i++)
+  {
+    copy = copy * base;
+  }
+  if(exponent == 0)
+  {
+    copy = 1;
+  }
+  return copy;
+}
 long long longlong_from_serial() {
-    String strings;
+    long long array[15];
+    long long temp;
     int i = 0;
+    int flag = 1;
+    long long sum = 0;
     char current;
     while(true)
     {
       current = Serial.read();
-      if(current != ' ' && current != '\n')
+      if(current != ' ' && current != '\n' && current != '-' && current != -1 && current > 47 && current < 58)
       {
-        strings[i] = current;
+        array[i] = (current - '0');
         i++;
-
+      }
+      else if(current == '-')
+      {
+        flag = -1;
+      }
+      else if(current == -1)
+      {
+        bool bytesarrived = wait_on_serial((uint8_t)1, (long)1000);
+        if(!bytesarrived)
+        {
+          break;
+        }
       }
       else
       {
         break;
       }
-    return strings.toInt();
     }
+    for(int j =0; j < i; j++)
+    {
+      temp = pow(10, i - j - 1);
+      sum = sum + (array[j] * temp);
+    }
+    return sum * flag;
 }
 void longlongtochar(char* myString, long long num, int &size) {
     long long numcpy = num;
@@ -41,11 +74,7 @@ void longlongtochar(char* myString, long long num, int &size) {
     }
     for(int i = size-1; i >= 0; i--)
     {
-      temp = (long long)pow(10, i);
-      if(temp > 10)
-      {
-        temp = temp +1;
-      }
+      temp = pow(10, i);
       temp2 = numcpy / (temp);
       temp3 = numcpy / (((temp) * 10));
       digit = temp2 - (temp3*10);
@@ -144,16 +173,27 @@ uint8_t get_waypoints(const lon_lat_32& start, const lon_lat_32& end) {
         char in_char = Serial.read();
         if(in_char == 'W')
         {
+          bytesarrived = wait_on_serial((uint8_t)1, (long)1000);
           space = Serial.read();
-          shared.waypoints[i].lon = longlong_from_serial();
+          bytesarrived = wait_on_serial((uint8_t)1, (long)1000);
           space = Serial.read();
-          shared.waypoints[i].lat = longlong_from_serial();
+          bytesarrived = wait_on_serial((uint8_t)7, (long)1000);
+          if(bytesarrived)
+          {
+            shared.waypoints[i].lat = longlong_from_serial();
+          }
+          bytesarrived = wait_on_serial((uint8_t)8, (long)1000);
+          if(bytesarrived)
+          {
+            shared.waypoints[i].lon = longlong_from_serial();
+          }
           i++;
-          endline = Serial.read();
           Serial.print("A\n");
         }
         else if(in_char == 'E')
         {
+          bytesarrived = wait_on_serial((uint8_t)1, (long)1000);
+          space = Serial.read();
           break;
         }
       }

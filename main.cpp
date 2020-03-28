@@ -182,6 +182,9 @@ int main(int argc, char *argv[]) {
                 if (searchtree.find(vertex2) == searchtree.end()) {
                     Serial.writeline("N 0\n");
                     bytesarrived = false;
+                    line = Serial.readline();
+                    path.clear();
+                    searchtree.clear();
                     cout << "No path" << endl;
                 }   
                 else 
@@ -202,8 +205,17 @@ int main(int argc, char *argv[]) {
                     Serial.writeline("N ");
                     cout << "Count " << count << " size " << size << endl;
                     cout << "Str: " << str << endl;
-                    Serial.writeline(str);
-                    Serial.writeline("\n");
+                    if(count + 1 >= 500){
+                        Serial.writeline("0");
+                        Serial.writeline("\n");
+                        bytesarrived = false;
+                        path.clear();
+                        searchtree.clear();
+                    }
+                    else{
+                        Serial.writeline(str);
+                        Serial.writeline("\n");
+                    }
                 }
             }
         }

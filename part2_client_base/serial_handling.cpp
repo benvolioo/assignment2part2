@@ -156,6 +156,9 @@ uint8_t get_waypoints(const lon_lat_32& start, const lon_lat_32& end) {
         {
           Serial.read();
           shared.num_waypoints = longlong_from_serial();
+          if(shared.num_waypoints == 0){
+            return 0;
+          }
         }
         Serial.print("A\n");
         gotNumPoints = 1;

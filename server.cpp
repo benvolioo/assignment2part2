@@ -257,6 +257,7 @@ int main(int argc, char *argv[])
                     Serial.writeline(line);
                     Serial.writeline("\n");
                 }
+                arduino = Serial.readline();
             }
             Serial.writeline("E");
             Serial.writeline("\n");
